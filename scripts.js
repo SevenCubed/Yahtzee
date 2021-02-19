@@ -1,3 +1,4 @@
+/*Old standby
 function gooi() {
     console.log('Er is gegooid');
     const worp = {
@@ -25,3 +26,14 @@ function gooi() {
     }
     console.log('Einde worp')
 }
+*/
+const unicodeDice = ['\u2680', '\u2681', '\u2682', '\u2683', '\u2684', '\u2685'];
+const result = []
+function throwDice() {
+    for(i=0; i<5; i++){
+    result[i] = Math.ceil(Math.random() * 6);
+    }
+}
+throwDice();
+result.sort((a,b) => a - b)
+console.log(result)
