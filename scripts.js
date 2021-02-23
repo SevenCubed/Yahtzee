@@ -28,12 +28,39 @@ function gooi() {
 }
 */
 const unicodeDice = ['\u2680', '\u2681', '\u2682', '\u2683', '\u2684', '\u2685'];
-const result = []
-function throwDice() {
-    for(i=0; i<5; i++){
-    result[i] = Math.ceil(Math.random() * 6);
+let result = []
+let diceMap = [0,0,0,0,0,0,0]
+const game = 1
+let z = [0,1,2,3]
+function roll() {
+    result = [1,6,3,4,3];
+    for(i=0; i<5; i++)
+    {
+    //result[i] = Math.ceil(Math.random() * 6);
+    diceMap[(result[i])]++
     }
+    for(i=1;i<7;i++){
+        var id = game+'roll'+i;
+        document.getElementById(id).innerHTML = i*diceMap[i];
+    }
+    console.log(result);
+    console.log(diceMap);
+    console.log('3s? ' + diceMap.some(n=>n>=3));
+    console.log('4s? ' + diceMap.some(n=>n>=4));
+    console.log('YAHTZEE?? ' + diceMap.some(n=>n===5));
+    console.log('Full house? ' + (diceMap.some(n=>n===2)&&diceMap.some(n=>n===3)));
+    console.log('Little straight ' )//+ (diceMap.filter(n => n >= 1).length >= 4));
+    //console.log(result.some(b=>z.every(c=>result.includes(c+b)))) Why does this work?
+    //console.log('Big straight? ' + //(diceMap.filter(n => n === 1).length === 5));
+    console.log('Chance! ' + result.reduce((acc, cv) => acc + cv));
+    diceMap = [0,0,0,0,0,0,0];
 }
-throwDice();
-result.sort((a,b) => a - b)
-console.log(result)
+
+
+
+
+
+
+
+
+//console.log('BREAKPOINT')
