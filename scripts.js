@@ -1,9 +1,14 @@
-//TODO remake layout
+/*TODO  - remake layout 
+        - consolidate the single die (ones,twos,...) properties into the object 
+        - validate score function
+        - 3 throw max, but not min
+*/
 //Variables
 const unicodeDice = ['\u2680', '\u2681', '\u2682', '\u2683', '\u2684', '\u2685'];
+let lockedDice = [false, false, false, false, false, false];
 let result = []
 let diceMap = [0,0,0,0,0,0]
-const game = 1
+let game = 1
 const strCheck= (arr, target) => target.every(n => arr.includes(n));
 let sumDice = 0
 //Score object
@@ -36,7 +41,7 @@ const scores = {
         id: document.getElementById('fullHouse'),
         locked: false,
         check: function(arr){
-            return ((arr.some((n) => n == 3) && arr.some((n) => n >= 2)) || arr.some((n) => n == 5));
+            return ((arr.some((n) => n == 3) && arr.some((n) => n == 2)) || arr.some((n) => n == 5));
         }
     },
     smallStr : {
@@ -88,21 +93,28 @@ function scoreClick() {
     document.getElementById(event.target.id).style.backgroundColor = 'salmon';
     previousEvent=event.target.id;
 }
-
+function diceClick() {
+    lockedDice[event.target.id.substring(4)] = !lockedDice[event.target.id.substring(4)];
+    document.getElementById(event.target.id).style.color = lockedDice[event.target.id.substring(4)] ? 'red' : 'black';
+    console.log(`Die number ${event.target.id.substring(4)} was just clicked. Its status is now ${lockedDice[event.target.id.substring(4)] ? 'locked' : 'unlocked'}.`);
+}
 //Event listeners
-document.getElementById('rollButton').addEventListener('click', roll, false);
+document.getElementById('rollButton').addEventListener('click', roll);
 for(const key of Object.keys(scores))
     {
-        scores[key].id.addEventListener('click', scoreClick, false);
+        scores[key].id.addEventListener('click', scoreClick);
     }
-
+for(i=1;i<6;i++)
+    {
+    document.getElementById('dice'+i).addEventListener('click', diceClick)
+    }
 //
 function roll() {
     console.clear();
     //result = [1,6,3,4,3];
     diceMap = [0,0,0,0,0,0];
     for(i=0; i<5; i++){
-    result[i] = Math.ceil(Math.random() * 6);
+    result[i] =  lockedDice[i+1]!=true ? Math.ceil(Math.random() * 6) : result[i]
     diceMap[(result[i]-1)]++
     document.getElementById('dice'+(i+1)).innerHTML = unicodeDice[result[i]-1];
     }
