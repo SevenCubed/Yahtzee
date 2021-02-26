@@ -1,21 +1,23 @@
 /*TODO  - remake layout 
-        - consolidate the single die (ones,twos,...) properties into the object 
         - validate score function
         - 3 throw max, but not min
 */
 //Variables
 const unicodeDice = ['\u2680', '\u2681', '\u2682', '\u2683', '\u2684', '\u2685'];
 let lockedDice = [false, false, false, false, false, false];
-let result = []
-let diceMap = [0,0,0,0,0,0]
+let result = [1,2,3,4,5]
+let diceMap = [1,1,1,1,1,0]
 let game = 1
 let sumDice = 0
-//Score object
-const scores = {
+let rollNumber = 1
+//Score objects
+const lowerScores = {
     trips : {
         name: 'Three of a Kind',
         flag: false,
-        value: [sumDice],
+        get value(){
+            return sumDice;
+        },
         id: document.getElementById('trips'),
         locked: false,
         check: function(arr){
@@ -25,7 +27,9 @@ const scores = {
     quads : {
         name: 'Four of a Kind',
         flag: false,
-        value: sumDice,
+        get value(){
+            return sumDice;
+        },
         id: document.getElementById('quads'),
         locked: false,
         check: function(arr){
@@ -75,7 +79,9 @@ const scores = {
     chance : {
         name: 'Chance',
         flag: true,
-        value: sumDice,
+        get value(){
+            return sumDice;
+        },
         id: document.getElementById('chance'),
         locked: false,
         check: function(arr){
@@ -83,7 +89,80 @@ const scores = {
         }
     }
 }
-
+const upperScores = {
+    ones: {
+        name: 'Ones',
+        flag: false,
+        get value(){
+            return 1*diceMap[(0)];
+        },
+        id: document.getElementById('ones'),
+        locked: false,
+        check: function(arr){
+            return true;
+        }
+    },
+    twos: {
+        name: 'Twos',
+        flag: false,
+        get value(){
+            return 2*diceMap[(1)];
+        },
+        id: document.getElementById('twos'),
+        locked: false,
+        check: function(arr){
+            return true;
+        }
+    },
+    threes: {
+        name: 'Threes',
+        flag: false,
+        get value(){
+            return 3*diceMap[(2)];
+        },
+        id: document.getElementById('threes'),
+        locked: false,
+        check: function(arr){
+            return true;
+        }
+    },
+    fours: {
+        name: 'Fours',
+        flag: false,
+        get value(){
+            return 4*diceMap[(3)];
+        },
+        id: document.getElementById('fours'),
+        locked: false,
+        check: function(arr){
+            return true;
+        }
+    },
+    fives: {
+        name: 'Fives',
+        flag: false,
+        get value(){
+            return 5*diceMap[(4)];
+        },
+        id: document.getElementById('fives'),
+        locked: false,
+        check: function(arr){
+            return true;
+        }
+    },
+    sixes: {
+        name: 'Sixes',
+        flag: false,
+        get value(){
+            return 6*diceMap[(5)];
+        },
+        id: document.getElementById('sixes'),
+        locked: false,
+        check: function(arr){
+            return true;
+        }
+    }
+}
 //Event Listener Functions
 let previousEvent = 'empty';
 function scoreClick() {
@@ -98,13 +177,17 @@ function diceClick() {
 }
 //Event listeners
 document.getElementById('rollButton').addEventListener('click', roll);
-for(const key of Object.keys(scores))
+for(const key of Object.keys(lowerScores))
     {
-        scores[key].id.addEventListener('click', scoreClick);
+        lowerScores[key].id.addEventListener('click', scoreClick);
+    }
+for(const key of Object.keys(upperScores))
+    {
+        upperScores[key].id.addEventListener('click', scoreClick);
     }
 for(i=1;i<6;i++)
     {
-    document.getElementById('dice'+i).addEventListener('click', diceClick)
+        document.getElementById('dice'+i).addEventListener('click', diceClick);
     }
 //
 function roll() {
@@ -112,29 +195,23 @@ function roll() {
     //result = [1,6,3,4,3];
     diceMap = [0,0,0,0,0,0];
     for(i=0; i<5; i++){
-    result[i] =  lockedDice[i+1]!=true ? Math.ceil(Math.random() * 6) : result[i]
-    diceMap[(result[i]-1)]++
-    document.getElementById('dice'+(i+1)).innerHTML = unicodeDice[result[i]-1];
+        result[i] =  lockedDice[i+1]!=true ? Math.ceil(Math.random() * 6) : result[i];
+        diceMap[(result[i]-1)]++;
+        document.getElementById('dice'+(i+1)).innerHTML = unicodeDice[result[i]-1];
     }
 //Upper Section
-    for(i=1;i<7;i++){
-        var id = game +'roll'+ i;
-        document.getElementById(id).innerHTML = i*diceMap[(i-1)];
+    for(const key of Object.keys(upperScores)){
+        upperScores[key].id.innerHTML = upperScores[key].value;
     }
-sumDice = result.reduce((x, y) => x + y)   
-console.log(sumDice)
-scores.chance.value = sumDice;
-scores.trips.value = sumDice; 
-scores.quads.value = sumDice;
+sumDice = result.reduce((acc, cv) => acc + cv);
 //Lower Section
-for(const key of Object.keys(scores))
+for(const key of Object.keys(lowerScores))
     {
-        console.log(`${scores[key].name}? ${scores[key].check(diceMap)} which is worth ${scores[key].value}`);
-        scores[key].id.innerHTML = scores[key].check(diceMap) ? scores[key].value : 0;
+        console.log(`${lowerScores[key].name}? ${lowerScores[key].check(diceMap)} which is worth ${lowerScores[key].value}`);
+        lowerScores[key].id.innerHTML = lowerScores[key].check(diceMap) ? lowerScores[key].value : 0;
     }
 
 }
-
 
 
 /* Score check reference
@@ -154,9 +231,3 @@ console.log('SS ' + (diceMap.slice(0,4).filter((n) => n >= 1).length == 4 || dic
 console.log('LS ' + (diceMap.filter((n) => n == 1).length >= 5 && diceMap[0]!=diceMap[5]) + ' 40'); 
 //There are only two possible BS maps, [0,1..] and [.. 1,0], so there is EITHER a 1 or 6. Checking for that to eliminate gapped straights 
 */
-
-
-
-
-//Upper Section
-//Aces, Twos, etc.
