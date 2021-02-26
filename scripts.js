@@ -9,11 +9,9 @@ let lockedDice = [false, false, false, false, false, false];
 let result = []
 let diceMap = [0,0,0,0,0,0]
 let game = 1
-const strCheck= (arr, target) => target.every(n => arr.includes(n));
 let sumDice = 0
 //Score object
 const scores = {
-    //add a subobject for the single die scores?
     trips : {
         name: 'Three of a Kind',
         flag: false,
@@ -27,7 +25,7 @@ const scores = {
     quads : {
         name: 'Four of a Kind',
         flag: false,
-        value: [sumDice],
+        value: sumDice,
         id: document.getElementById('quads'),
         locked: false,
         check: function(arr){
@@ -139,7 +137,8 @@ for(const key of Object.keys(scores))
 
 
 
-/*
+/* Score check reference
+//const strCheck= (arr, target) => target.every(n => arr.includes(n)); Unnecessary Straight Check
 console.log('Result: ' + result);
 console.log('Map: ' + diceMap);
 console.log('SS ' + (strCheck(result, [3,4,5,6])||strCheck(result, [1,2,3,4])||strCheck(result, [2,3,4,5])) + ' 30'); //Small Straight(30)
