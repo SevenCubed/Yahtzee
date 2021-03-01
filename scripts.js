@@ -1,15 +1,17 @@
 /*TODO  - remake layout 
         - validate score function
         - 3 throw max, but not min
+        - consolidate upper and lower?
 */
 //Variables
 const unicodeDice = ['\u2680', '\u2681', '\u2682', '\u2683', '\u2684', '\u2685'];
 let lockedDice = [false, false, false, false, false, false];
-let result = [1,2,3,4,5]
-let diceMap = [1,1,1,1,1,0]
-let game = 1
-let sumDice = 0
-let rollNumber = 1
+let result = [1,2,3,4,5];
+let diceMap = [1,1,1,1,1,0];
+let game = 1;
+let sumDice = 0;
+let rollNumber = 0;
+let totalScore = 0;
 //Score objects
 const lowerScores = {
     trips : {
@@ -163,8 +165,20 @@ const upperScores = {
         }
     }
 }
+//Event listeners
+document.getElementById('rollButton').addEventListener('click', roll);
+document.getElementById('confirmButton').addEventListener('click', confirm);
+for(const key of Object.keys(lowerScores)){
+    lowerScores[key].id.addEventListener('click', scoreClick);
+}
+for(const key of Object.keys(upperScores)){
+    upperScores[key].id.addEventListener('click', scoreClick);
+}
+for(i=1;i<6;i++){
+    document.getElementById('dice'+i).addEventListener('click', diceClick);
+}
 //Event Listener Functions
-let previousEvent = 'empty';
+let previousEvent = 'chance';
 function scoreClick() {
     document.getElementById(previousEvent).style.backgroundColor = 'transparent';
     document.getElementById(event.target.id).style.backgroundColor = 'salmon';
@@ -175,24 +189,26 @@ function diceClick() {
     document.getElementById(event.target.id).style.color = lockedDice[event.target.id.substring(4)] ? 'red' : 'black';
     console.log(`Die number ${event.target.id.substring(4)} was just clicked. Its status is now ${lockedDice[event.target.id.substring(4)] ? 'locked' : 'unlocked'}.`);
 }
-//Event listeners
-document.getElementById('rollButton').addEventListener('click', roll);
-for(const key of Object.keys(lowerScores))
-    {
-        lowerScores[key].id.addEventListener('click', scoreClick);
+function confirm() {
+    console.log('Confirming scores and resetting the dice...');
+    rollNumber = 0;
+    console.log(previousEvent)
+    console.log(lowerScores[previousEvent].name);
+    upperScores[previousEvent].locked = true;
+    lowerScores[previousEvent].locked = true;
+    totalScore += upperScores[previousEvent].value;
+    document.getElementById(previousEvent).style.backgroundColor = 'transparent';
+    console.log(totalScore);
+    document.getElementById('rollButton').addEventListener('click', roll);
+    for (i=1; i<6; i++){
+        lockedDice[i] = false;
+        document.getElementById('dice'+i).style.color = 'black';
     }
-for(const key of Object.keys(upperScores))
-    {
-        upperScores[key].id.addEventListener('click', scoreClick);
-    }
-for(i=1;i<6;i++)
-    {
-        document.getElementById('dice'+i).addEventListener('click', diceClick);
-    }
-//
+    document.getElementById('rollButton').innerHTML = `Roll! (${3-rollNumber})`;
+}
 function roll() {
+    rollNumber++
     console.clear();
-    //result = [1,6,3,4,3];
     diceMap = [0,0,0,0,0,0];
     for(i=0; i<5; i++){
         result[i] =  lockedDice[i+1]!=true ? Math.ceil(Math.random() * 6) : result[i];
@@ -210,6 +226,8 @@ for(const key of Object.keys(lowerScores))
         console.log(`${lowerScores[key].name}? ${lowerScores[key].check(diceMap)} which is worth ${lowerScores[key].value}`);
         lowerScores[key].id.innerHTML = lowerScores[key].check(diceMap) ? lowerScores[key].value : 0;
     }
+document.getElementById('rollButton').innerHTML = `Roll! (${3-rollNumber})`;
+if (rollNumber >= 3){document.getElementById('rollButton').removeEventListener('click', roll);}
 
 }
 
