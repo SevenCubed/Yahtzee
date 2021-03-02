@@ -11,9 +11,14 @@ let diceMap = [1,1,1,1,1,0];
 let game = 1;
 let sumDice = 0;
 let rollNumber = 0;
+let lowerTotal = 0;
+let upperTotal = 0;
 let totalScore = 0;
+let bonus = 0;
+let bonusThreshold = 10; //debugging purposes
+let previousEvent = 'empty';
 //Score objects
-const lowerScores = {
+const scores = {
     trips : {
         name: 'Three of a Kind',
         flag: false,
@@ -21,6 +26,7 @@ const lowerScores = {
             return sumDice;
         },
         id: document.getElementById('trips'),
+        upper: false,
         locked: false,
         check: function(arr){
             return arr.some((n) => n >= 3);
@@ -33,6 +39,7 @@ const lowerScores = {
             return sumDice;
         },
         id: document.getElementById('quads'),
+        upper: false,
         locked: false,
         check: function(arr){
             return arr.some((n) => n >= 4);
@@ -43,6 +50,7 @@ const lowerScores = {
         flag: false,
         value: 25,
         id: document.getElementById('fullHouse'),
+        upper: false,
         locked: false,
         check: function(arr){
             return ((arr.some((n) => n == 3) && arr.some((n) => n == 2)) || arr.some((n) => n == 5));
@@ -53,6 +61,7 @@ const lowerScores = {
         flag: false,
         value: 30,
         id: document.getElementById('smallStr'),
+        upper: false,
         locked: false,
         check: function(arr){
             return (arr.slice(0,4).filter((n) => n >= 1).length == 4 || arr.slice(1,5).filter((n) => n >= 1).length == 4  || arr.slice(2,6).filter((n) => n >= 1).length == 4);
@@ -63,6 +72,7 @@ const lowerScores = {
         flag: false,
         value: 40,
         id: document.getElementById('largeStr'),
+        upper: false,
         locked: false,
         check: function(arr){
             return (arr.filter((n) => n == 1).length >= 5 && arr[0]!=arr[5]);
@@ -73,6 +83,7 @@ const lowerScores = {
         flag: false,
         value: 50,
         id: document.getElementById('yahtzee'),
+        upper: false,
         locked: false,
         check: function(arr){
             return arr.some((n) => n == 5);
@@ -89,9 +100,7 @@ const lowerScores = {
         check: function(arr){
             return true;
         }
-    }
-}
-const upperScores = {
+    },
     ones: {
         name: 'Ones',
         flag: false,
@@ -99,6 +108,7 @@ const upperScores = {
             return 1*diceMap[(0)];
         },
         id: document.getElementById('ones'),
+        upper: true,
         locked: false,
         check: function(arr){
             return true;
@@ -111,6 +121,7 @@ const upperScores = {
             return 2*diceMap[(1)];
         },
         id: document.getElementById('twos'),
+        upper: true,
         locked: false,
         check: function(arr){
             return true;
@@ -123,6 +134,7 @@ const upperScores = {
             return 3*diceMap[(2)];
         },
         id: document.getElementById('threes'),
+        upper: true,
         locked: false,
         check: function(arr){
             return true;
@@ -135,6 +147,7 @@ const upperScores = {
             return 4*diceMap[(3)];
         },
         id: document.getElementById('fours'),
+        upper: true,
         locked: false,
         check: function(arr){
             return true;
@@ -147,6 +160,7 @@ const upperScores = {
             return 5*diceMap[(4)];
         },
         id: document.getElementById('fives'),
+        upper: true,
         locked: false,
         check: function(arr){
             return true;
@@ -159,6 +173,7 @@ const upperScores = {
             return 6*diceMap[(5)];
         },
         id: document.getElementById('sixes'),
+        upper: true,
         locked: false,
         check: function(arr){
             return true;
@@ -168,45 +183,57 @@ const upperScores = {
 //Event listener generation
 document.getElementById('rollButton').addEventListener('click', roll);
 document.getElementById('confirmButton').addEventListener('click', confirm);
-for(const key of Object.keys(lowerScores)){
-    lowerScores[key].id.addEventListener('click', scoreClick);
-}
-for(const key of Object.keys(upperScores)){
-    upperScores[key].id.addEventListener('click', scoreClick);
+for(const key of Object.keys(scores)){
+    scores[key].id.addEventListener('click', scoreClick);
 }
 for(i=1;i<6;i++){
     document.getElementById('dice'+i).addEventListener('click', diceClick);
 }
 //Event Listener Functions
-let previousEvent = 'chance';
 function scoreClick() {
+    if(rollNumber == 0){return alert("Roll the dice first!")}
+    if(scores[event.target.id].locked != true){
     document.getElementById(previousEvent).style.backgroundColor = 'transparent';
     document.getElementById(event.target.id).style.backgroundColor = 'salmon';
     previousEvent=event.target.id;
+    }
 }
 function diceClick() {
+    if(rollNumber >= 3){return alert("You are out of rolls!")}
+    if(rollNumber == 0){return alert("Roll the dice first!")}
     lockedDice[event.target.id.substring(4)] = !lockedDice[event.target.id.substring(4)];
     document.getElementById(event.target.id).style.color = lockedDice[event.target.id.substring(4)] ? 'red' : 'black';
     console.log(`Die number ${event.target.id.substring(4)} was just clicked. Its status is now ${lockedDice[event.target.id.substring(4)] ? 'locked' : 'unlocked'}.`);
 }
 function confirm() {
+    if(rollNumber == 0){return alert("Roll the dice first!")}
+    if(previousEvent == 'empty'){return alert("Select a score box first!")}
     console.log('Confirming scores and resetting the dice...');
     rollNumber = 0;
-    console.log(previousEvent)
-    console.log(lowerScores[previousEvent].name);
-    upperScores[previousEvent].locked = true;
-    lowerScores[previousEvent].locked = true;
-    totalScore += upperScores[previousEvent].value;
-    document.getElementById(previousEvent).style.backgroundColor = 'transparent';
-    console.log(totalScore);
-    document.getElementById('rollButton').addEventListener('click', roll);
+    //document.getElementById('rollButton').addEventListener('click', roll);
+    scores[previousEvent].locked = true;
+    upperTotal = scores[previousEvent].upper ? upperTotal + scores[previousEvent].value : upperTotal;
+    lowerTotal = scores[previousEvent].upper ? lowerTotal : lowerTotal + scores[previousEvent].value;
+    if(upperTotal > bonusThreshold && bonus == 0){
+        bonus = 35;
+        document.getElementById('bonus').innerHTML = '35'
+    }
+    totalScore = upperTotal + lowerTotal + bonus;
+    document.getElementById('upperTotal').innerHTML = upperTotal;
+    document.getElementById('upperTotalBonus').innerHTML = upperTotal + bonus;
+    document.getElementById('lowerTotal').innerHTML = lowerTotal;
+    document.getElementById('totalScore').innerHTML = totalScore;
+    document.getElementById(previousEvent).style.backgroundColor = 'crimson';
     for (i=1; i<6; i++){
         lockedDice[i] = false;
         document.getElementById('dice'+i).style.color = 'black';
     }
     document.getElementById('rollButton').innerHTML = `Roll! (${3-rollNumber})`;
+    previousEvent = 'empty';
+    console.log(totalScore);
 }
 function roll() {
+    if(rollNumber >= 3){return alert("You are out of rolls!")}
     rollNumber++
     console.clear();
     diceMap = [0,0,0,0,0,0];
@@ -215,20 +242,16 @@ function roll() {
         diceMap[(result[i]-1)]++;
         document.getElementById('dice'+(i+1)).innerHTML = unicodeDice[result[i]-1];
     }
-//Upper Section
-    for(const key of Object.keys(upperScores)){
-        upperScores[key].id.innerHTML = upperScores[key].value;
-    }
-sumDice = result.reduce((acc, cv) => acc + cv);
-//Lower Section
-for(const key of Object.keys(lowerScores))
+    sumDice = result.reduce((acc, cv) => acc + cv);
+    for(const key of Object.keys(scores))
     {
-        console.log(`${lowerScores[key].name}? ${lowerScores[key].check(diceMap)} which is worth ${lowerScores[key].value}`);
-        lowerScores[key].id.innerHTML = lowerScores[key].check(diceMap) ? lowerScores[key].value : 0;
+        if(scores[key].locked != true){
+        console.log(`${scores[key].name}? ${scores[key].check(diceMap)} which is worth ${scores[key].value}`);
+        scores[key].id.innerHTML = scores[key].check(diceMap) ? scores[key].value : 0;
+        }
     }
-document.getElementById('rollButton').innerHTML = `Roll! (${3-rollNumber})`;
-if (rollNumber >= 3){document.getElementById('rollButton').removeEventListener('click', roll);}
-
+    document.getElementById('rollButton').innerHTML = `Roll! (${3-rollNumber})`;
+    //if (rollNumber >= 3){document.getElementById('rollButton').removeEventListener('click', roll);}
 }
 
 

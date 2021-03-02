@@ -26,7 +26,7 @@
 
         <div class="button">
             <button id="rollButton" class="btn wHover" >Roll! (3)</button>
-            <button id="confirmButton" class="btn wHover">Confirm!</button>
+            <button id="confirmButton" class="btn wHover">Confirm !</button>
         </div>
 
         <div class="round">
@@ -38,13 +38,7 @@
 
         <div class="paper">
             <table>
-                <tr>
-                    <td class="noBorder"></td>
-                </tr>
-                <tr>
-                    <th class="title noBorder" colspan="7">scoreblok</th>
-                    <th class="title noBorder"><img class="posImg" src="images/dice.png"></th>
-                </tr>
+                <tr>                   
                 <tr>
                     <td class="noBorder"></td>
                 </tr>
@@ -99,21 +93,21 @@
                 <tr id="total">
                     <td class="uppercase" colspan="2">totaal</td>
                     <td class="arrow">&#10132;</td>
-                    <td id="upperScore" class="fillFont"></td>
+                    <td id="upperTotal" class="fillFont"></td>
 
                 </tr>
-                <tr id="bonus">
+                <tr>
                     <td class="noBorderRight">bonus</td>
                     <td class="alt noBorderLeft">als totaal 63<br>of meer is</td>
                     <td class="howToScore">35 punten</td>
                     <td id="bonus" class="fillFont"></td>
 
                 </tr>
-                <tr id="upperTotal">
+                <tr id="upperTotalScore">
                     <td class="uppercase noBorderRight">totaal</td>
                     <td class="alt uppercase noBorderLeft">van de<br>bovenste<br>helft</td>
                     <td class="arrow">&#10132;</td>
-                    <td id="totalUpperScore" class="fillFont"></td>
+                    <td id="upperTotalBonus" class="fillFont"></td>
 
                 </tr>
                 <tr>
@@ -159,30 +153,23 @@
                     <td id="yahtzee" class="fillFont keepScore"></td>
 
                 </tr>
-                <tr id="chance">
+                <tr>
                     <td colspan="2">chance</td>
                     <td class="howToScore">totaal van alle dobbelstenen</td>
                     <td id="chance" class="fillFont keepScore"></td>
 
                 </tr>
-                <tr id="lowerTotal">
+                <tr>
                     <td class="uppercase noBorderRight">totaal</td>
                     <td class="alt uppercase noBorderLeft">van de<br>onderste<br>helft</td>
                     <td class="arrow">&#10132;</td>
-                    <td id="lowerScore" class="fillFont"></td>
+                    <td id="lowerTotal" class="fillFont"></td>
 
                 </tr>
-                <tr id="lowUpperTotal">
-                    <td class="uppercase noBorderRight">totaal</td>
-                    <td class="alt uppercase noBorderLeft">van de<br>bovenste<br>helft</td>
-                    <td class="arrow">&#10132;</td>
-                    <td id="upperScoreLower" class="fillFont"></td>
-
-                </tr>
-                <tr id="grandTotal">
+                <tr>
                     <td class="bold" colspan="2">totaal generaal</td>
                     <td class="arrow">&#10132;</td>
-                    <td id="grandTotal" class="fillFont"></td>
+                    <td id="totalScore" class="fillFont"></td>
 
                 </tr>
             </table>
