@@ -165,7 +165,7 @@ const upperScores = {
         }
     }
 }
-//Event listeners
+//Event listener generation
 document.getElementById('rollButton').addEventListener('click', roll);
 document.getElementById('confirmButton').addEventListener('click', confirm);
 for(const key of Object.keys(lowerScores)){
